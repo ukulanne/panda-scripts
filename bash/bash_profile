@@ -1,0 +1,164 @@
+##########################
+## Anne Summers         ##
+## <ukulanne@gmail.com> ##
+## June 26, 2001        ##
+##########################
+ 
+###########################################
+# Time-stamp: <2018-05-03 15:11:07 panda> #
+###########################################
+
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+EDITOR=emacs-nox
+SHELL=/usr/bin/$0
+
+_OS="$(uname)"
+ 
+if [ $_OS == "AIX" ]
+then
+    export LD_LIBRARY_PATH=/opt/freeware/lib/gcc/powerpc-ibm-aix7.1.0.0/6.3.0/ppc64/
+    export TERM=vt100
+    export PATH=/usr/linux/bin:$PATH:$HOME/node10/bin
+
+    _DISTR="AIX"
+
+    alias meminfo="lparstat -i | grep Memory"
+    alias cpuinfo="lparstat -i | grep CPU"
+  
+    alias rte-query="lslpp -l"
+    alias rte-list="lslpp -f"
+    
+    alias emacs='/usr/bin/emacs-nox'
+    alias nano='emacs-nox'
+
+    PS1='[\u@\h \W]\$'
+fi
+
+#case $_OS in
+#   AIX)   alias emacs=/usr/bin/emacs-nox;;
+#   Linux) alias foo='/path/to/linux/bin/foo';;
+#   FreeBSD|OpenBSD) alias foo='/path/to/bsd/bin/foo' ;;
+#   SunOS) alias foo='/path/to/sunos/bin/foo' ;;
+#   *) ;;
+#esac
+
+if [ $_OS == "Linux" ]
+then 
+    _DISTR="$(lsb_release -d -s)"
+    alias meminfo='free -m -l -t' 
+    alias cpuinfo='lscpu'
+    alias batinfo='dmidecode -t 22'
+    alias laptopinfo='dmidecode -t 1'
+    
+     if [ "$_DISTR"=='"Red Hat Enterprise Linux Workstation release 7.4 (Maipo)"' ]
+     then
+         alias update='sudo yum update'
+         alias introduce='sudo yum install'
+     else
+         alias update='sudo dnf update'
+         alias introduce='sudo dnf install'
+     fi
+else
+    alias update='sudo yum update'
+fi     
+
+if [ $_OS == "SunOS" ]
+then
+    echo "Are these still valid?"
+    alias update="pkg update"
+    alias introduce="pkg install" 
+fi
+
+#if [ $UID -ne 0 ]; then
+#    alias update='sudo yum update'
+#fi
+
+alias find-symlink="find . -type l -printf '%p -> %l\n'"
+
+alias rpm-all="rpm -qa"
+alias rpm-query="rpm -qa| grep"
+alias rpm-list="rpm -ql"
+
+alias diskspace="du -Sh | sort -n -r | more"
+
+alias grep='grep --color=auto'
+alias tab-find=" grep -P '\t' * -n"
+
+alias now='date +"%T"'
+alias today='date +"%d-%m-%Y"'
+
+
+alias glogin="cat $HOME/.password | gsa_login -p"
+
+export PATH EDITOR PS1
+export CMVC_AUTH_METHOD=PW
+ 
+up (){
+  local d=""
+  limit=$1
+  for ((i=1 ; i <= limit ; i++))
+    do
+      d=$d/..
+    done
+  d=$(echo $d | sed 's/^\///')
+  if [ -z "$d" ]; then
+    d=..
+  fi
+  cd $d
+}
+
+gistory (){
+    history | grep $1
+}
+
+mkcd (){
+    mkdir -p $1
+    cd $1
+}
+
+extract (){
+  if [ -f $1 ] ; then
+      case $1 in
+          *.tar.bz2)   tar xvjf $1    ;;
+          *.tar.gz)    tar xvlfz $1   ;;
+          *.bz2)       bunzip2 $1     ;;
+          *.rar)       rar x $1       ;;
+          *.gz)        gunzip $1      ;;
+          *.tar)       tar xvf $1     ;;
+          *.tbz2)      tar xvjf $1    ;;
+          *.tgz)       tar xvzf $1    ;;
+          *.zip)       unzip $1       ;;
+          *.Z)         uncompress $1  ;;
+          *.7z)        7z x $1        ;;
+          *)           echo "Don't know what to do with file '$1'..." ;;
+      esac
+  else
+      echo "'$1' is not valid.!"
+  fi
+}
+
+file-count (){
+
+if [ "$#" -ne 1 ]
+ then
+    echo "Usage: file-count-dir BASE_DIR"
+ else
+    find "$1" -type f | wc -l
+fi
+}
+
+youtube2mp3 (){
+
+if [ "$#" -ne 1 ]
+ then
+        echo "Requires youtube-dl"
+	echo "Usage: youtube2mp3 URL"
+ else
+     youtube-dl -i --extract-audio --audio-format mp3 "$1"
+ fi
+}
+
