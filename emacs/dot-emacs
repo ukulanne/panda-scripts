@@ -167,6 +167,7 @@
 
 (setq-default indent-tabs-mode nil)
 
+(setq global-linum-mode t) ;;Lines in all files
 (linum-mode 1)
 
 (add-to-list 'load-path "/home/panda/src/git/tern/emacs/")
