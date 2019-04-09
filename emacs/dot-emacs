@@ -167,9 +167,6 @@
 
 (setq-default indent-tabs-mode nil)
 
-(setq global-linum-mode t) ;;Lines in all files
-(linum-mode 1)
-
 (add-to-list 'load-path "/home/panda/src/git/tern/emacs/")
 (autoload 'tern-mode "tern.el" nil t)
 
@@ -177,6 +174,10 @@
 (add-hook 'js-mode-hook   (lambda () (tern-mode t)))
 (add-hook 'js-mode-hook   (lambda () (linum-mode 1)))
 (add-hook 'sgml-mode-hook (lambda ()(linum-mode 1)))
+
+(global-linum-mode 1)
+(setq global-linum-mode t) ;;Lines in all files
+(linum-mode 1)
 
 (eval-after-load 'tern 
    '(progn
@@ -197,6 +198,26 @@
 
 (unless (server-running-p)
   (server-start))
+
+(defmacro with-unix (os &rest body)
+  "Eval BODY if `system-type' is OS."
+  (declare (indent defun))
+  `(when (eq system-type ',os) ,@body))
+
+(defun pkg-installed-msg (name pkg)
+       (message "%s mode installed %s "
+                name (if (package-installed-p pkg) "[TRUE]" "[FALSE]")))
+
+(message "Checking for installed modules")
+(pkg-installed-msg "Feature" 'feature-mode)
+(pkg-installed-msg "Js2-mode" 'js2-mode)
+(pkg-installed-msg "Tern-mode" 'tern-mode)
+(pkg-installed-msg "Neotree-mode" 'neotree-mode)
+
+
+(with-unix gnu/linux (message "Operating system:  [GNU/Linux]"))
+
+(with-unix aix (message "Operating system:  [AIX]"))
 
 (message "Dixitque Deus fiat lux et facta est Emacs.")
 (message "Save the pandas!")
