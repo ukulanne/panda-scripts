@@ -5,7 +5,7 @@
 ##########################
  
 ###########################################
-# Time-stamp: <2018-05-03 15:11:07 panda> #
+# Time-stamp: <2021-12-07 19:59:31 panda> #
 ###########################################
 
 if [ -f ~/.bashrc ]; then
@@ -15,9 +15,10 @@ fi
 PATH=$PATH:$HOME/.local/bin:$HOME/bin
 EDITOR=emacs-nox
 SHELL=/usr/bin/$0
+CLOUD_ENV=local
 
 _OS="$(uname)"
- 
+
 if [ $_OS == "AIX" ]
 then
     export LD_LIBRARY_PATH=/opt/freeware/lib/gcc/powerpc-ibm-aix7.1.0.0/6.3.0/ppc64/
@@ -28,14 +29,20 @@ then
 
     alias meminfo="lparstat -i | grep Memory"
     alias cpuinfo="lparstat -i | grep CPU"
-  
+
+    alias update='sudo yum update'
+    alias introduce='sudo yum install'
+    alias dependencies='sudo yum deplist'
+
+    alias fupdate='flatkpak update'
+
     alias rte-query="lslpp -l"
     alias rte-list="lslpp -f"
-    
+
     alias emacs='/usr/bin/emacs-nox'
     alias nano='emacs-nox'
 
-    PS1='[\u@\h \W]\$'
+    PS1='[\u@\h \W]\$ '
 fi
 
 #case $_OS in
@@ -47,24 +54,28 @@ fi
 #esac
 
 if [ $_OS == "Linux" ]
-then 
+then
     _DISTR="$(lsb_release -d -s)"
-    alias meminfo='free -m -l -t' 
+    alias meminfo='free -m -l -t'
     alias cpuinfo='lscpu'
     alias batinfo='dmidecode -t 22'
     alias laptopinfo='dmidecode -t 1'
-    
-     if [ "$_DISTR"=='"Red Hat Enterprise Linux Workstation release 7.4 (Maipo)"' ]
-     then
-         alias update='sudo yum update'
-         alias introduce='sudo yum install'
-     else
-         alias update='sudo dnf update'
-         alias introduce='sudo dnf install'
-     fi
+
+    PS1='[\u@pandatlan \W]\$ '
+
+    alias update='sudo dnf update'
+    alias introduce='sudo dnf install'
+    alias dependencies='sudo dnf deplist'
+    alias fupdate='flatkpak update'
+    alias docker='podman'
+    alias ls='exa --git'
+    alias gerp='grep'
+    alias ngrep='grep --color=auto --exclude-dir=node_modules'
+    alias nstart='npm run startDev'
+
 else
     alias update='sudo yum update'
-fi     
+fi
 
 if [ $_OS == "SunOS" ]
 then
@@ -73,29 +84,36 @@ then
     alias introduce="pkg install" 
 fi
 
-#if [ $UID -ne 0 ]; then
-#    alias update='sudo yum update'
-#fi
+zzh (){
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
+        eval `ssh-agent`
+        ssh-add
+    fi
+}
+
+if [ $UID -ne 0 ]; then
+    alias docker='sudo docker'
+fi
 
 alias find-symlink="find . -type l -printf '%p -> %l\n'"
 
+alias git-diff="git diff --name-only"
+
 alias rpm-all="rpm -qa"
-alias rpm-query="rpm -qa| grep"
+alias rpm-query="rpm -qa| grep "
 alias rpm-list="rpm -ql"
+alias rpm-download="sudo dnf download "
 
 alias diskspace="du -Sh | sort -n -r | more"
 
-alias grep='grep --color=auto'
 alias tab-find=" grep -P '\t' * -n"
 
 alias now='date +"%T"'
 alias today='date +"%d-%m-%Y"'
 
-
-alias glogin="cat $HOME/.password | gsa_login -p"
+#alias grep='grep --color=auto'
 
 export PATH EDITOR PS1
-export CMVC_AUTH_METHOD=PW
  
 up (){
   local d=""
@@ -161,4 +179,27 @@ if [ "$#" -ne 1 ]
      youtube-dl -i --extract-audio --audio-format mp3 "$1"
  fi
 }
+
+
+###############################
+## gsa and IBM related stuff ##
+##############################
+
+
+ps-top (){
+
+    while true; do
+        clear
+-        ps -ao rssize=,pid=,tty=,user=,args= | sort -nr | egrep -v "<defunct>|<exiting>|<idle>" | head -n10
+        sleep 10
+    done
+}
+
+
+
+gsource(){
+
+    source $HOME/.bash_profile
+}
+
 
