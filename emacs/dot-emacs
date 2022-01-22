@@ -4,7 +4,7 @@
 ;; June 26, 1999                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Time-stamp: <2018-05-02 11:46:20 panda>                
+;; Time-stamp: <2022-01-20 13:48:46 panda>                
 
 ;; .emacs configuration file
 ;;   Copyright (C) <1999>  <Anne Summers>
@@ -22,9 +22,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;;    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(package-initialize)
-
-;;(global-auto-complete-mode t)
+;; (global-auto-complete-mode t)
 (eval-after-load 'auto-complete '(global-auto-complete-mode 1))
 
 (set 'temporary-file-directory "/tmp")
@@ -37,49 +35,39 @@
 (if (not (memq 'time-stamp write-file-hooks))
     (setq write-file-hooks
 	  (cons 'time-stamp write-file-hooks)))
-(setq time-stamp-active t)
 
-;; We look for a time stamp in the first 20 line not 8
+(setq time-stamp-active t)
  
 (setq time-stamp-pattern "20/Time-stamp:[ \t]+\\\\?[\"<]+%:y-%02m-%02d %02H:%02M:%02S %u\\\\?[\">]")
 
 ;; The following line ensures that emacs deletes the #buffer# files
 ;; that it uses for auto-save files.
 
-(setq delete-auto-save-files t)
+;;(setq delete-auto-save-files t)
 
 ;; If you don't like the fact that emacs leaves buffer~ files laying
 ;; around when it quits use this command.
 
 (setq make-backup-files nil) 
 
-;; remove toolbar and scrollbar
+(setq backup-directory-alist `(("." . "/tmp")))
+
+;; This is to prevent node from crashing when typing a Vue file
+(setq create-lockfiles nil)
 
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-;; turn off the annoying alarm bell
-
 (setq ring-bell-function 'ignore)
 
-;; Name of shell to use
 (setq shell-file-name "bash")
 
-;; C coding style prefs
-;;(c-set-style "k&r")
-;;(setq c-basic-offset 8)
-
-;;(setq-user-full-name "Anne Summers")
-
-(setq user-mail-address "")
-
-;; Open unidentified files in text mode
+(setq user-mail-address "arlrios@us.ibm.com")
 
 (setq default-major-mode 'text-mode)
 
-;; Display clock 
-
 (setq display-time-24hr-format t)
+
 (display-time)
 
 ;; Compile command line to use :
@@ -103,6 +91,7 @@
 (global-set-key "\C-x\C-g" 'goto-line)
 (global-set-key "\C-x\C-j" 'compile-command)
 
+(global-set-key [f1] 'list-packages)           
 (global-set-key [f2] 'find-file)           
 (global-set-key [f3] 'kill-buffer-fast)    
 (global-set-key [f4] 'goto-line)           
@@ -119,13 +108,11 @@
 
 (global-set-key [home] 'beginning-of-line)
 (global-set-key [end] 'end-of-line)
-(global-set-key [C-next]  'scroll-other-window)
-(global-set-key [C-prior] 'scroll-other-window-down)
+;;(global-set-key [C-next]  'scroll-other-window)
+;;(global-set-key [C-prior] 'scroll-other-window-down)
 
-; Do not show the GNU splash screen
 (setq inhibit-startup-message t)
 
-; Make all "yes or no" prompts show "y or n" instead
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
@@ -136,30 +123,41 @@
 (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
 (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode))
 
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(setq js2-strict-missing-semi-warning nil)
+;;(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;;(setq js2-strict-missing-semi-warning nil)
 (add-to-list 'interpreter-mode-alist '("nodemon " . js2-mode))
-
 
 (add-to-list 'load-path "/home/panda/src/git/neotree")
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
 
 
+
+;;(let ((default-directory  "~/.emacs.d/lisp/"))
+;;  (normal-top-level-add-subdirs-to-load-path))
+
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/")
+(add-to-list 'load-path "~/.emacs.d/elpa/ssass-mode-20190521.249/")
+(add-to-list 'load-path "~/.emacs.d/elpa/nodejs-repl-0.2.2/")
+(add-to-list 'load-path "~/.emacs.d/elpa/edit-indirect-20180422.1807/")
+
+
+;;(require 'nodejs-repl)
+(add-hook 'js-mode-hook
+          (lambda ()
+            (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
+            (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
+            (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+            (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+            (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
+
+;;(require 'mmm-mode)
+;;(require 'vue-html-mode)
+;;(require 'vue-mode)
+
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-;;(package-initialize)
-
-;;(require 'package) 
-;(add-to-list 'package-archives
- ;;          '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-;; (add-to-list 'package-archives
-;;              '("melpa" . "https://melpa.org/packages/") t)
-;;(package-initialize)
-
-(add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/"))
-(setq dart-enable-analysis-server t)
-(add-hook 'dart-mode-hook 'flycheck-mode)
+(add-to-list 'package-archives '("melpa" . "http://stable.melpa.org/packages/") t)
+(package-initialize)
 
 (require 'color-theme)
 (color-theme-initialize)
@@ -167,17 +165,26 @@
 
 (setq-default indent-tabs-mode nil)
 
-(add-to-list 'load-path "/home/panda/src/git/tern/emacs/")
+;; Indent 2 spaces for js modes
+;;(setq tab-width 2)
+(setq js-indent-level 2)
+;;(defvaralias js2-indent-level 'tab-width)
+
+(add-to-list 'load-path "/home/panda/opt/tern/emacs/")
 (autoload 'tern-mode "tern.el" nil t)
 
-
 (add-hook 'js-mode-hook   (lambda () (tern-mode t)))
+
 (add-hook 'js-mode-hook   (lambda () (linum-mode 1)))
-(add-hook 'sgml-mode-hook (lambda ()(linum-mode 1)))
+(add-hook 'sgml-mode-hook (lambda () (linum-mode 1)))
 
 (global-linum-mode 1)
-(setq global-linum-mode t) ;;Lines in all files
 (linum-mode 1)
+
+
+;;(use-package restclient
+;;  :ensure t
+;;  :mode (("\\.http\\'" . restclient-mode)))
 
 (eval-after-load 'tern 
    '(progn
@@ -187,12 +194,16 @@
 (require 'whitespace)
 (autoload 'whitespace-mode "whitespace" "Toggle whitespace visualization." t)
 
-(require 'feature-mode)
-(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+;;(require 'feature-mode)
+;;(add-to-list 'auto-mode-alist '("\.feature$" . feature-mode))
+
+
+(setq markdown-command "pandoc")
 
 (when (not (display-graphic-p))
-  (message "I am on emacs-nox.")
+  (message "Running emacs on the console [TRUE]")
   (xterm-mouse-mode 1))
+
 
 (require 'server)
 
@@ -211,15 +222,37 @@
 (message "Checking for installed modules")
 (pkg-installed-msg "Feature" 'feature-mode)
 (pkg-installed-msg "Js2-mode" 'js2-mode)
+(pkg-installed-msg "rjsx-mode" 'rjsx-mode)
+(pkg-installed-msg "vue-mode" 'vue-mode)
+(pkg-installed-msg "nodejs-repl" 'nodejs-repl)
 (pkg-installed-msg "Tern-mode" 'tern-mode)
-(pkg-installed-msg "Neotree-mode" 'neotree-mode)
+(pkg-installed-msg "Neotree-mode" 'neotree)
 
 
 (with-unix gnu/linux (message "Operating system:  [GNU/Linux]"))
 
 (with-unix aix (message "Operating system:  [AIX]"))
 
+;;(byte-compile-file "~/.emacs.d/file-name-all-completions-aix/file-name-all-completions-aix.el" t)
+
+;;(eval-after-load "file-name-all-completions-aix"
+;;  (advice-add  #'file-name-all-completions :filter-return #'file-name-all-completions-aix))
+
 (message "Dixitque Deus fiat lux et facta est Emacs.")
 (message "Save the pandas!")
 
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(markdown-mode nodejs-repl mmm-mode vue-mode rjsx-mode indium tern-auto-complete npm-mode js2-mode feature-mode)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 
